@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -17,6 +18,8 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut, loading } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,6 +38,11 @@ export function Header() {
     const newIsDark = !isDark;
     setIsDark(newIsDark);
     document.documentElement.classList.toggle("dark", newIsDark);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
   };
 
   return (
@@ -93,16 +101,33 @@ export function Header() {
 
             {/* Auth buttons - Desktop */}
             <div className="hidden lg:flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" className="rounded-xl">
-                  Log in
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-glow">
-                  Get Started
-                </Button>
-              </Link>
+              {!loading && (
+                <>
+                  {user ? (
+                    <Button 
+                      variant="ghost" 
+                      className="rounded-xl"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  ) : (
+                    <>
+                      <Link to="/login">
+                        <Button variant="ghost" className="rounded-xl">
+                          Log in
+                        </Button>
+                      </Link>
+                      <Link to="/signup">
+                        <Button className="rounded-xl bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 shadow-glow">
+                          Get Started
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -144,16 +169,36 @@ export function Header() {
               </Link>
             ))}
             <div className="pt-4 space-y-2">
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full rounded-xl">
-                  Log in
-                </Button>
-              </Link>
-              <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow">
-                  Get Started
-                </Button>
-              </Link>
+              {!loading && (
+                <>
+                  {user ? (
+                    <Button 
+                      variant="ghost" 
+                      className="w-full rounded-xl"
+                      onClick={() => {
+                        handleSignOut();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  ) : (
+                    <>
+                      <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full rounded-xl">
+                          Log in
+                        </Button>
+                      </Link>
+                      <Link to="/signup" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow">
+                          Get Started
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
