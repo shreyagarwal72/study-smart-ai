@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366F1"/>
+      <stop offset="100%" style="stop-color:#818CF8"/>
+    </linearGradient>
+  </defs>
+  <!-- Brain + Calendar fusion icon -->
+  <rect x="64" y="64" width="384" height="384" rx="80" fill="url(#gradient)"/>
+  <!-- Calendar grid lines -->
+  <line x1="160" y1="160" x2="160" y2="352" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.3"/>
+  <line x1="256" y1="160" x2="256" y2="352" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.3"/>
+  <line x1="352" y1="160" x2="352" y2="352" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.3"/>
+  <line x1="128" y1="224" x2="384" y2="224" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.3"/>
+  <line x1="128" y1="304" x2="384" y2="304" stroke="white" stroke-width="16" stroke-linecap="round" opacity="0.3"/>
+  <!-- Brain symbol -->
+  <circle cx="256" cy="256" r="80" fill="white" opacity="0.95"/>
+  <path d="M220 240 C220 220, 240 210, 256 210 C272 210, 292 220, 292 240 C292 255, 280 265, 280 280 L232 280 C232 265, 220 255, 220 240" fill="url(#gradient)" opacity="0.9"/>
+  <path d="M232 285 L280 285 C280 300, 270 310, 256 310 C242 310, 232 300, 232 285" fill="url(#gradient)" opacity="0.9"/>
+  <!-- Neural connections -->
+  <circle cx="235" cy="248" r="8" fill="white"/>
+  <circle cx="277" cy="248" r="8" fill="white"/>
+  <circle cx="256" cy="270" r="6" fill="white"/>
+  <!-- Top calendar hook -->
+  <rect x="176" y="48" width="24" height="48" rx="12" fill="white"/>
+  <rect x="312" y="48" width="24" height="48" rx="12" fill="white"/>
+</svg>
