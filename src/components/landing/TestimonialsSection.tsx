@@ -1,33 +1,20 @@
-import { Star, Quote } from "lucide-react";
+import { Sparkles, Users, TrendingUp, Target } from "lucide-react";
 
-const testimonials = [
+const stats = [
   {
-    name: "Priya Sharma",
-    role: "JEE Aspirant",
-    avatar: "PS",
-    content: "Task2Top completely transformed my JEE preparation. The AI-generated schedule helped me cover all subjects systematically. Scored AIR 450!",
-    rating: 5,
+    icon: Users,
+    value: "Join thousands",
+    label: "of students using Task2Top",
   },
   {
-    name: "Rahul Verma",
-    role: "NEET Student",
-    avatar: "RV",
-    content: "The smart revision feature is a game-changer. It automatically reminded me to revise topics at the right intervals. Highly recommended for medical aspirants.",
-    rating: 5,
+    icon: TrendingUp,
+    value: "AI-Powered",
+    label: "Smart scheduling technology",
   },
   {
-    name: "Ananya Patel",
-    role: "College Student",
-    avatar: "AP",
-    content: "Managing multiple courses was overwhelming until I found Task2Top. Now I can balance all my subjects and still have time for extracurriculars.",
-    rating: 5,
-  },
-  {
-    name: "Vikram Singh",
-    role: "UPSC Aspirant",
-    avatar: "VS",
-    content: "The Pomodoro timer and progress tracking keep me accountable. My study streak is at 45 days! This app understands what serious aspirants need.",
-    rating: 5,
+    icon: Target,
+    value: "Personalized",
+    label: "Tailored to your goals",
   },
 ];
 
@@ -37,47 +24,40 @@ export function TestimonialsSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center max-w-2xl mx-auto mb-12 lg:mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Why Task2Top?</span>
+          </div>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            Loved by <span className="text-primary">50,000+</span> Students
+            Study Smarter, <span className="text-primary">Not Harder</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            See what students are saying about their experience with Task2Top
+            Our AI-powered platform helps you create the perfect study schedule tailored to your unique needs
           </p>
         </div>
 
-        {/* Testimonials grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
-          {testimonials.map((testimonial, index) => (
+        {/* Stats grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+          {stats.map((stat, index) => (
             <div
-              key={testimonial.name}
-              className="glass-card-hover p-6 lg:p-8 relative"
+              key={stat.label}
+              className="glass-card-hover p-8 text-center"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              {/* Quote icon */}
-              <Quote className="absolute top-6 right-6 w-8 h-8 text-primary/20" />
-
-              {/* Rating */}
-              <div className="flex items-center gap-1 mb-4">
-                {Array.from({ length: testimonial.rating }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                ))}
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary-glow/20 flex items-center justify-center mx-auto mb-4">
+                <stat.icon className="w-8 h-8 text-primary" />
               </div>
-
-              {/* Content */}
-              <p className="text-foreground mb-6 leading-relaxed">"{testimonial.content}"</p>
-
-              {/* Author */}
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center text-primary-foreground font-semibold">
-                  {testimonial.avatar}
-                </div>
-                <div>
-                  <div className="font-semibold">{testimonial.name}</div>
-                  <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                </div>
-              </div>
+              <div className="font-display text-2xl font-bold mb-2">{stat.value}</div>
+              <div className="text-muted-foreground">{stat.label}</div>
             </div>
           ))}
+        </div>
+
+        {/* Call to action */}
+        <div className="mt-12 text-center">
+          <p className="text-muted-foreground">
+            Ready to transform your study routine? Try Task2Top today!
+          </p>
         </div>
       </div>
     </section>
