@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Sun, Moon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -85,7 +86,10 @@ export function Header() {
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Notification Bell - only show when logged in */}
+            {user && <NotificationBell />}
+
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}

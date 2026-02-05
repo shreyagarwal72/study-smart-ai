@@ -1,73 +1,70 @@
-# Welcome to your Lovable project
+# Task2Top - AI Study Planner
 
-## Project info
+Task2Top is an AI-powered study planning application designed for students in India, specifically aligned with the CBSE NCERT curriculum. It helps students create personalized study schedules, track their progress, and achieve academic success.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Features
 
-## How can I edit this code?
+### AI-Powered Study Planning
+- **Personalized Schedules**: AI generates optimized weekly study schedules based on your subjects, priorities, and available time
+- **Smart Time Allocation**: Automatically allocates more time to weaker subjects
+- **Pomodoro Integration**: Built-in 25/5 minute study sessions with breaks
 
-There are several ways of editing your application.
+### CBSE NCERT Curriculum Support
+- Full support for Classes 1-12
+- Stream selection for Class 11-12 (Science PCM/PCB, Commerce, Arts)
+- Competitive exam preparation (JEE, NEET, UPSC, CAT, GATE)
 
-**Use Lovable**
+### Dashboard & Analytics
+- **Study Streak Tracking**: Maintain daily study streaks with gamification
+- **Weekly Progress Charts**: Visualize study hours by day and subject
+- **Today's Schedule**: Quick view of daily study sessions
+- **Pomodoro Timer**: Focus timer with break reminders
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Additional Features
+- **Dark/Light Theme**: Comfortable studying in any lighting
+- **Notification Alerts**: Study reminders and achievement notifications
+- **Responsive Design**: Works on desktop, tablet, and mobile
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Tech Stack
 
-**Use your preferred IDE**
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Backend**: Supabase (Database, Auth, Edge Functions)
+- **AI**: Lovable AI Gateway (Gemini 3 Flash)
+- **State Management**: TanStack Query
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📱 Pages
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Home** (`/`): Landing page with features and testimonials
+- **Planner** (`/planner`): Step-by-step study plan creation wizard
+- **Dashboard** (`/dashboard`): Personalized dashboard with schedule and stats
+- **Blog** (`/blog`): Study tips and educational content
+- **About** (`/about`): About the platform
+- **Login/Signup**: Authentication with email and Google OAuth
 
-Follow these steps:
+## 🚀 Deployment
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+The app is deployed on:
+- **Lovable**: https://task2top.lovable.app
+- **Vercel**: Supports custom domain deployment with OAuth
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Vercel Configuration
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+The `vercel.json` is configured for SPA routing:
+```json
+{
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/" }
+  ]
+}
 ```
 
-**Edit a file directly in GitHub**
+## 🔐 Authentication
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Email/Password signup with auto-confirmation
+- Google OAuth (works on both lovable.app and custom domains)
+- Session persistence across page reloads
 
-**Use GitHub Codespaces**
+## 📄 License
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT License - Built with ❤️ for students worldwide
