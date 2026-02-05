@@ -56,12 +56,45 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
     
-    const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
+    try {
+      // Detect if we're on a custom domain (Vercel, etc.)
+      const isCustomDomain =
+        !window.location.hostname.includes("lovable.app") &&
+        !window.location.hostname.includes("lovableproject.com");
 
-    if (error) {
-      toast.error(error.message);
+      if (isCustomDomain) {
+        // For custom domains (Vercel), use Supabase directly with skipBrowserRedirect
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: `${window.location.origin}/dashboard`,
+            skipBrowserRedirect: true,
+          },
+        });
+
+        if (error) throw error;
+
+        // Validate OAuth URL before redirect
+        if (data?.url) {
+          const oauthUrl = new URL(data.url);
+          const allowedHosts = ["accounts.google.com"];
+          if (!allowedHosts.some((host) => oauthUrl.hostname.includes(host))) {
+            throw new Error("Invalid OAuth redirect URL");
+          }
+          window.location.href = data.url;
+        }
+      } else {
+        // For Lovable domains, use the managed auth-bridge
+        const { error } = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        });
+
+        if (error) {
+          throw error;
+        }
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign up with Google");
       setGoogleLoading(false);
     }
   };
