@@ -6,6 +6,8 @@ import { StatsCards } from "@/components/dashboard/StatsCards";
 import { TodaySchedule } from "@/components/dashboard/TodaySchedule";
 import { WeeklyChart } from "@/components/dashboard/WeeklyChart";
 import { QuoteCard } from "@/components/dashboard/QuoteCard";
+import { PomodoroTimer } from "@/components/dashboard/PomodoroTimer";
+import { WeeklyCalendar } from "@/components/dashboard/WeeklyCalendar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
@@ -65,16 +67,23 @@ const Dashboard = () => {
             <StatsCards />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Today's schedule */}
             <TodaySchedule />
 
-            {/* Motivation & Quick actions */}
+            {/* Pomodoro Timer & Quick actions */}
             <div className="space-y-6">
+              <PomodoroTimer />
               <QuoteCard />
-              <WeeklyChart />
             </div>
+
+            {/* Weekly progress */}
+            <WeeklyChart />
           </div>
+
+          {/* Weekly Calendar - Full width */}
+          <WeeklyCalendar />
         </div>
       </div>
     </Layout>
