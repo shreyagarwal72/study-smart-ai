@@ -23,6 +23,7 @@ import { classLevels, getSubjectsForLevel } from "@/lib/planner-data";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useGenerateSchedule } from "@/hooks/useStudyData";
 
 interface SubjectWithPriority {
   name: string;
@@ -38,8 +39,10 @@ export function StudyPlannerForm() {
   const [dailyHours, setDailyHours] = useState(4);
   const [examDate, setExamDate] = useState<Date>();
   const [loading, setLoading] = useState(false);
+  const [generatingSchedule, setGeneratingSchedule] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const generateSchedule = useGenerateSchedule();
 
   const selectedClass = classLevels.find((c) => c.value === classLevel);
   const needsStream = selectedClass?.category === "higher-secondary";
@@ -87,7 +90,7 @@ export function StudyPlannerForm() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.from("study_plans").insert([{
+      const { data, error } = await supabase.from("study_plans").insert([{
         user_id: user.id,
         title: `${selectedClass?.label || ""} ${stream ? `(${stream})` : ""} Study Plan`,
         class_level: classLevel,
@@ -96,16 +99,28 @@ export function StudyPlannerForm() {
         exam_date: examDate?.toISOString().split("T")[0],
         daily_hours: dailyHours,
         is_active: true,
-      }]);
+      }]).select().single();
 
       if (error) throw error;
 
-      toast.success("Study plan created! Redirecting to dashboard...");
+      // Generate AI schedule
+      setGeneratingSchedule(true);
+      toast.info("Generating your personalized schedule with AI...");
+      
+      try {
+        await generateSchedule.mutateAsync(data.id);
+        toast.success("Study plan created with AI-generated schedule!");
+      } catch (scheduleError) {
+        console.error("Schedule generation failed:", scheduleError);
+        toast.warning("Study plan saved! Schedule generation will be available soon.");
+      }
+
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Failed to create study plan");
     } finally {
       setLoading(false);
+      setGeneratingSchedule(false);
     }
   };
 
@@ -300,11 +315,14 @@ export function StudyPlannerForm() {
           ) : (
             <Button
               onClick={handleSubmit}
-              disabled={!canProceed() || loading}
+              disabled={!canProceed() || loading || generatingSchedule}
               className="rounded-xl bg-gradient-to-r from-primary to-primary-glow group"
             >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+              {loading || generatingSchedule ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  {generatingSchedule ? "Generating Schedule..." : "Saving..."}
+                </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
