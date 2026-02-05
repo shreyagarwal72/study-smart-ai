@@ -46,7 +46,8 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Check your email to confirm your account!");
+      toast.success("Account created successfully!");
+      navigate("/dashboard");
     }
     
     setLoading(false);
