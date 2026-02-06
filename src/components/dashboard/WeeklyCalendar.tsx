@@ -6,16 +6,24 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface ScheduleBlock {
-  time: string;
+interface ScheduleSession {
   subject: string;
   topic: string;
-  duration: number;
+  startTime: string;
+  endTime: string;
+  type: string;
+  color: string;
 }
 
 interface DaySchedule {
   day: string;
-  blocks: ScheduleBlock[];
+  sessions: ScheduleSession[];
+}
+
+interface ScheduleData {
+  weeklySchedule?: DaySchedule[];
+  dailyTips?: string[];
+  focusAreas?: string[];
 }
 
 const SUBJECT_COLORS: Record<string, string> = {
@@ -27,8 +35,11 @@ const SUBJECT_COLORS: Record<string, string> = {
   Hindi: "bg-red-500/20 border-red-500/30 text-red-700 dark:text-red-300",
   History: "bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-300",
   Geography: "bg-teal-500/20 border-teal-500/30 text-teal-700 dark:text-teal-300",
+  Science: "bg-red-500/20 border-red-500/30 text-red-700 dark:text-red-300",
   "Computer Science": "bg-indigo-500/20 border-indigo-500/30 text-indigo-700 dark:text-indigo-300",
   Economics: "bg-cyan-500/20 border-cyan-500/30 text-cyan-700 dark:text-cyan-300",
+  Buffer: "bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-300",
+  Break: "bg-slate-400/20 border-slate-400/30 text-slate-600 dark:text-slate-400",
   default: "bg-primary/20 border-primary/30 text-primary",
 };
 
@@ -56,14 +67,20 @@ export function WeeklyCalendar() {
     setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }));
   };
 
-  // Parse schedule from plan
-  const schedule: DaySchedule[] = plan?.schedule as DaySchedule[] || [];
+  // Parse schedule from plan - handle both object and array formats
+  const scheduleData: ScheduleData | null = plan?.schedule as ScheduleData | null;
+  const weeklySchedule: DaySchedule[] = Array.isArray(scheduleData) 
+    ? scheduleData 
+    : (scheduleData?.weeklySchedule || []);
   
-  const getBlocksForDay = (dayName: string): ScheduleBlock[] => {
-    const daySchedule = schedule.find(
-      (d) => d.day.toLowerCase() === dayName.toLowerCase()
+  const getSessionsForDay = (dayName: string): ScheduleSession[] => {
+    if (!Array.isArray(weeklySchedule)) {
+      return [];
+    }
+    const daySchedule = weeklySchedule.find(
+      (d) => d.day?.toLowerCase() === dayName.toLowerCase()
     );
-    return daySchedule?.blocks || [];
+    return daySchedule?.sessions || [];
   };
 
   if (isLoading) {
@@ -148,7 +165,7 @@ export function WeeklyCalendar() {
       <div className="grid grid-cols-7 gap-2 min-h-[300px]">
         {weekDays.map((day) => {
           const dayName = format(day, "EEEE");
-          const blocks = getBlocksForDay(dayName);
+          const sessions = getSessionsForDay(dayName);
           
           return (
             <div
@@ -161,31 +178,31 @@ export function WeeklyCalendar() {
               )}
             >
               <div className="space-y-2">
-                {blocks.length === 0 ? (
+                {sessions.length === 0 ? (
                   <p className="text-xs text-muted-foreground text-center py-4">
                     Rest day
                   </p>
                 ) : (
-                  blocks.slice(0, 4).map((block, idx) => (
+                  sessions.filter(s => s.type !== "break").slice(0, 4).map((session, idx) => (
                     <div
                       key={idx}
                       className={cn(
                         "p-2 rounded-lg border text-xs",
-                        getSubjectColor(block.subject)
+                        getSubjectColor(session.subject)
                       )}
                     >
-                      <p className="font-medium truncate">{block.subject}</p>
-                      <p className="text-[10px] opacity-70 truncate">{block.topic}</p>
+                      <p className="font-medium truncate">{session.subject}</p>
+                      <p className="text-[10px] opacity-70 truncate">{session.topic}</p>
                       <div className="flex items-center gap-1 mt-1 opacity-60">
                         <Clock className="w-3 h-3" />
-                        <span>{block.duration}m</span>
+                        <span>{session.startTime} - {session.endTime}</span>
                       </div>
                     </div>
                   ))
                 )}
-                {blocks.length > 4 && (
+                {sessions.filter(s => s.type !== "break").length > 4 && (
                   <p className="text-[10px] text-muted-foreground text-center">
-                    +{blocks.length - 4} more
+                    +{sessions.filter(s => s.type !== "break").length - 4} more
                   </p>
                 )}
               </div>
