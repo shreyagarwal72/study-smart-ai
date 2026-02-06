@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, LogOut } from "lucide-react";
+import { Menu, X, Sun, Moon, LogOut, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
@@ -108,14 +108,21 @@ export function Header() {
               {!loading && (
                 <>
                   {user ? (
-                    <Button 
-                      variant="ghost" 
-                      className="rounded-xl"
-                      onClick={handleSignOut}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </Button>
+                    <>
+                      <Link to="/settings">
+                        <Button variant="ghost" size="icon" className="rounded-xl">
+                          <Settings className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                      <Button 
+                        variant="ghost" 
+                        className="rounded-xl"
+                        onClick={handleSignOut}
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
                   ) : (
                     <>
                       <Link to="/login">
@@ -176,17 +183,25 @@ export function Header() {
               {!loading && (
                 <>
                   {user ? (
-                    <Button 
-                      variant="ghost" 
-                      className="w-full rounded-xl"
-                      onClick={() => {
-                        handleSignOut();
-                        setIsMobileMenuOpen(false);
-                      }}
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
-                    </Button>
+                    <>
+                      <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full rounded-xl">
+                          <Settings className="w-4 h-4 mr-2" />
+                          Settings
+                        </Button>
+                      </Link>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full rounded-xl"
+                        onClick={() => {
+                          handleSignOut();
+                          setIsMobileMenuOpen(false);
+                        }}
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
                   ) : (
                     <>
                       <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>

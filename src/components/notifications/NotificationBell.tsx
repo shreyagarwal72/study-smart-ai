@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Bell, X, CheckCircle, Clock, Target, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,59 +6,17 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-
-interface Notification {
-  id: string;
-  type: "reminder" | "achievement" | "streak" | "tip";
-  title: string;
-  message: string;
-  time: Date;
-  read: boolean;
-}
-
-// Sample notifications - in production these would come from the backend
-const getInitialNotifications = (): Notification[] => [
-  {
-    id: "1",
-    type: "streak",
-    title: "Keep your streak alive! 🔥",
-    message: "You haven't studied today. Complete a session to maintain your streak.",
-    time: new Date(),
-    read: false,
-  },
-  {
-    id: "2",
-    type: "reminder",
-    title: "Study session starting soon",
-    message: "Your scheduled Mathematics session starts in 30 minutes.",
-    time: new Date(Date.now() - 30 * 60 * 1000),
-    read: false,
-  },
-  {
-    id: "3",
-    type: "tip",
-    title: "💡 Study Tip",
-    message: "Take short breaks every 25 minutes to maintain focus and retention.",
-    time: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    read: true,
-  },
-  {
-    id: "4",
-    type: "achievement",
-    title: "🎉 Achievement Unlocked!",
-    message: "You completed 10 hours of study this week. Keep it up!",
-    time: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    read: true,
-  },
-];
+import { useNotifications, type Notification } from "@/hooks/useNotifications";
+import { useState } from "react";
 
 const getNotificationIcon = (type: Notification["type"]) => {
   switch (type) {
     case "reminder":
       return <Clock className="w-4 h-4 text-primary" />;
     case "achievement":
-      return <Target className="w-4 h-4 text-success" />;
+      return <Target className="w-4 h-4 text-green-500" />;
     case "streak":
       return <Flame className="w-4 h-4 text-orange-500" />;
     case "tip":
@@ -67,7 +24,8 @@ const getNotificationIcon = (type: Notification["type"]) => {
   }
 };
 
-const formatTime = (date: Date): string => {
+const formatTime = (dateString: string): string => {
+  const date = new Date(dateString);
   const now = new Date();
   const diff = now.getTime() - date.getTime();
   const minutes = Math.floor(diff / (1000 * 60));
@@ -81,33 +39,24 @@ const formatTime = (date: Date): string => {
 };
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const {
+    notifications,
+    loading,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    clearAll,
+  } = useNotifications();
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    // Initialize notifications
-    setNotifications(getInitialNotifications());
-  }, []);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+  if (loading) {
+    return (
+      <Button variant="ghost" size="icon" className="relative" disabled>
+        <Bell className="w-5 h-5" />
+      </Button>
     );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
-
-  const removeNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
-  };
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -169,17 +118,19 @@ export function NotificationBell() {
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={cn(
-                        "text-sm font-medium truncate",
-                        !notification.read && "text-foreground"
-                      )}>
+                      <p
+                        className={cn(
+                          "text-sm font-medium truncate",
+                          !notification.read && "text-foreground"
+                        )}
+                      >
                         {notification.title}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {notification.message}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {formatTime(notification.time)}
+                        {formatTime(notification.created_at)}
                       </p>
                     </div>
                     <Button
@@ -188,7 +139,7 @@ export function NotificationBell() {
                       className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removeNotification(notification.id);
+                        deleteNotification(notification.id);
                       }}
                     >
                       <X className="w-3 h-3" />
