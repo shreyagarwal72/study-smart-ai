@@ -4,14 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, Key } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Secret codes for quick access
+const SECRET_CODES: Record<string, { email: string; password: string }> = {
+  opbolte: { email: "opbolte@task2top.app", password: "opbolte2025secure" },
+  vanshubhaiop: { email: "vanshubhaiop@task2top.app", password: "vanshubhai2025secure" },
+};
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [secretCode, setSecretCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
@@ -41,17 +49,64 @@ const Login = () => {
     setLoading(false);
   };
 
+  const handleSecretCodeLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const code = secretCode.toLowerCase().trim();
+    const credentials = SECRET_CODES[code];
+    
+    if (!credentials) {
+      toast.error("Invalid access code");
+      return;
+    }
+
+    setLoading(true);
+    
+    // Try to sign in first
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: credentials.email,
+      password: credentials.password,
+    });
+
+    if (signInError) {
+      // If user doesn't exist, create account
+      if (signInError.message.includes("Invalid login credentials")) {
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: credentials.email,
+          password: credentials.password,
+          options: {
+            data: { full_name: code === "opbolte" ? "OP Bolte" : "Vanshu Bhai" }
+          }
+        });
+
+        if (signUpError) {
+          toast.error(signUpError.message);
+          setLoading(false);
+          return;
+        }
+        
+        toast.success("Account created! Welcome!");
+        navigate("/dashboard");
+      } else {
+        toast.error(signInError.message);
+      }
+    } else {
+      toast.success("Welcome back!");
+      navigate("/dashboard");
+    }
+    
+    setLoading(false);
+  };
+
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     
     try {
-      // Detect if we're on a custom domain (Vercel, etc.)
       const isCustomDomain =
         !window.location.hostname.includes("lovable.app") &&
         !window.location.hostname.includes("lovableproject.com");
 
       if (isCustomDomain) {
-        // For custom domains (Vercel), use Supabase directly with skipBrowserRedirect
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: "google",
           options: {
@@ -62,7 +117,6 @@ const Login = () => {
 
         if (error) throw error;
 
-        // Validate OAuth URL before redirect
         if (data?.url) {
           const oauthUrl = new URL(data.url);
           const allowedHosts = ["accounts.google.com"];
@@ -72,7 +126,6 @@ const Login = () => {
           window.location.href = data.url;
         }
       } else {
-        // For Lovable domains, use the managed auth-bridge
         const { error } = await lovable.auth.signInWithOAuth("google", {
           redirect_uri: window.location.origin,
         });
@@ -102,58 +155,110 @@ const Login = () => {
             <p className="text-muted-foreground mt-2">Sign in to continue your study journey</p>
           </div>
 
-          {/* Login form */}
+          {/* Login form with tabs */}
           <div className="glass-card p-8">
-            <form onSubmit={handleEmailLogin} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    className="pl-10 rounded-xl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-              </div>
+            <Tabs defaultValue="email" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="email" className="rounded-lg">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email
+                </TabsTrigger>
+                <TabsTrigger value="secret" className="rounded-lg">
+                  <Key className="w-4 h-4 mr-2" />
+                  Quick Access
+                </TabsTrigger>
+              </TabsList>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    className="pl-10 rounded-xl"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-              </div>
+              <TabsContent value="email">
+                <form onSubmit={handleEmailLogin} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        className="pl-10 rounded-xl"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
 
-              <Button 
-                type="submit" 
-                className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow py-6 group"
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    Sign In
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </>
-                )}
-              </Button>
-            </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        className="pl-10 rounded-xl"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow py-6 group"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        Sign In
+                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="secret">
+                <form onSubmit={handleSecretCodeLogin} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="secretCode">Access Code</Label>
+                    <div className="relative">
+                      <Key className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        id="secretCode"
+                        type="password"
+                        placeholder="Enter your secret code"
+                        className="pl-10 rounded-xl"
+                        value={secretCode}
+                        onChange={(e) => setSecretCode(e.target.value)}
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/50 rounded-xl p-4 text-sm text-muted-foreground">
+                    <p>🔑 <strong>Quick Access:</strong> Use your special access code for instant login without email verification.</p>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full rounded-xl bg-gradient-to-r from-primary to-primary-glow py-6 group"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        Access Now
+                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
 
             {/* Divider */}
             <div className="relative my-6">
